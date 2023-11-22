@@ -4,8 +4,6 @@ import { create } from "zustand"
 
 import { v4 as getId } from "uuid"
 
-import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined"
-
 interface MenuStore {
     pageList: Page[]
     addLabelPage: (name: string) => void
@@ -83,16 +81,18 @@ const useMenuStore = create<MenuStore>(
         },
         editLabelName: (currentName, newName) => {
             set((state) => {
-                // Map through the pageList to find and update the label
                 const updatedPageList = state.pageList.map((page) => {
                     if (
                         page.type === PageType.LABEL &&
                         page.name === currentName
                     ) {
-                        // If it's the label we want to edit, update its name
-                        return { ...page, name: newName }
+                        return {
+                            ...page,
+                            name: newName,
+                            path: `/label?name=${newName}`,
+                        }
                     }
-                    return page // Otherwise, leave it as is
+                    return page
                 })
 
                 return {

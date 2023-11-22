@@ -2,14 +2,14 @@ import { Container, Grid, IconButton, TextField } from "@mui/material"
 import React, { useState } from "react"
 
 import Modal from "react-modal"
-import styles from "./editlabelmodal.module.css"
+import styles from "./adddlabelmodal.module.css"
 
-import CloseIcon from "@mui/icons-material/Close"
-import { useNavigate } from "react-router-dom"
 import useModalStore from "apps/modalStore"
 import useMenuStore from "apps/menuStore"
-import useBarStore from "apps/sidebarStore"
 import PageType from "models/pageType"
+
+import "primereact/resources/themes/lara-light-indigo/theme.css"
+import useNoteStore from "apps/noteStore"
 
 Modal.setAppElement("#root")
 
@@ -27,18 +27,16 @@ const customStyles = {
     },
 }
 
-const EditLabelModal = () => {
-    // const navigate = useNavigate()
-    const { isModalOpen, closeModal } = useModalStore()
-    const { isMouseOpen, isBarOpen, toggleBar } = useBarStore()
-    const { pageList, addLabelPage, getLabelList, editLabelName, deleteLabel } =
-        useMenuStore()
+const AddLabelModal = () => {
+    const { isAddModalOpen, closeAddModal } = useModalStore()
+
+    const { pageList, addLabelPage, getLabelList } = useMenuStore()
+    const { addLabelsToNote, currentLabel, deleteLabelsFromNote } =
+        useNoteStore()
 
     const [labelName, setLabelName] = useState("")
     const [mode, setMode] = useState(true)
-    const [subMode, setSubMode] = useState(true)
-    const [editingLabel, setEditingLabel] = useState<string | null>(null)
-    const [editingLabelName, setEditingLabelName] = useState("")
+
     const [errorMessage, setErrorMessage] = useState("")
 
     const handleAddLabel = () => {
@@ -54,7 +52,6 @@ const EditLabelModal = () => {
             return
         }
 
-        // Add the label if it doesn't exist
         addLabelPage(labelName)
         setLabelName("")
         setErrorMessage("")
@@ -62,10 +59,10 @@ const EditLabelModal = () => {
 
     return (
         <Modal
-            isOpen={isModalOpen}
+            isOpen={isAddModalOpen}
             onRequestClose={() => {
                 setMode(true)
-                closeModal()
+                closeAddModal()
             }}
             style={customStyles}
         >
@@ -84,7 +81,7 @@ const EditLabelModal = () => {
                         marginLeft: 0,
                     }}
                 >
-                    레이블 수정
+                    레이블 추가
                 </Grid>
                 <Grid
                     item
@@ -152,19 +149,11 @@ const EditLabelModal = () => {
             <div>
                 <ul className={styles.list_value}>
                     {getLabelList().map((item) => {
-                        const isEditing = editingLabel === item
-
                         return (
                             <li key={item} className={styles.li_value}>
-                                {!isEditing ? (
+                                {!currentLabel.includes(item) ? (
                                     <>
-                                        <div
-                                            onClick={() => {
-                                                setEditingLabel(item)
-                                                setEditingLabelName(item)
-                                            }}
-                                            className={styles.label_container}
-                                        >
+                                        <div className={styles.label_container}>
                                             <IconButton
                                                 onClick={() => setMode(!mode)}
                                                 style={{ fontSize: "15px" }}
@@ -179,18 +168,18 @@ const EditLabelModal = () => {
                                         </div>
                                         <IconButton
                                             onClick={() => {
-                                                deleteLabel(item)
+                                                addLabelsToNote(item)
                                             }}
                                             style={{ fontSize: "15px" }}
                                         >
                                             <span className="material-symbols-outlined">
-                                                delete
+                                                add
                                             </span>
                                         </IconButton>
                                     </>
                                 ) : (
                                     <>
-                                        <div>
+                                        <div className={styles.label_container}>
                                             <IconButton
                                                 onClick={() => setMode(!mode)}
                                                 style={{ fontSize: "15px" }}
@@ -199,31 +188,18 @@ const EditLabelModal = () => {
                                                     label
                                                 </span>
                                             </IconButton>
-                                            <TextField
-                                                required
-                                                id="standard-required"
-                                                variant="standard"
-                                                value={editingLabelName}
-                                                onChange={(e) =>
-                                                    setEditingLabelName(
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Make a New Label"
-                                            />
+                                            <div className={styles.label_name}>
+                                                {item}
+                                            </div>
                                         </div>
                                         <IconButton
                                             onClick={() => {
-                                                editLabelName(
-                                                    item,
-                                                    editingLabelName
-                                                )
-                                                setEditingLabel(null)
+                                                deleteLabelsFromNote(item)
                                             }}
                                             style={{ fontSize: "15px" }}
                                         >
                                             <span className="material-symbols-outlined">
-                                                check
+                                                close
                                             </span>
                                         </IconButton>
                                     </>
@@ -234,7 +210,10 @@ const EditLabelModal = () => {
                 </ul>
             </div>
             <div style={{ textAlign: "right", fontSize: "10px" }}>
-                <IconButton onClick={closeModal} style={{ fontSize: "15px" }}>
+                <IconButton
+                    onClick={closeAddModal}
+                    style={{ fontSize: "15px" }}
+                >
                     완료
                 </IconButton>
             </div>
@@ -242,4 +221,4 @@ const EditLabelModal = () => {
     )
 }
 
-export default EditLabelModal
+export default AddLabelModal

@@ -1,17 +1,15 @@
 import useMenuStore from "apps/menuStore"
 import useModalStore from "apps/modalStore"
-import React, { useState } from "react"
+import React from "react"
 import { Link, useLocation } from "react-router-dom"
 import { Menu, MenuItem, Sidebar, sidebarClasses } from "react-pro-sidebar"
 
-import { v4 as getId } from "uuid"
-
 import useBarStore from "apps/sidebarStore"
-import PageType from "models/pageType"
+
 import getIconComponent from "utils/getIcon"
 
 const MainSideBar = () => {
-    const { pageList, addLabelPage } = useMenuStore()
+    const { pageList } = useMenuStore()
     const { openModal } = useModalStore()
     const location = useLocation()
 
@@ -52,7 +50,7 @@ const MainSideBar = () => {
                                         <Link
                                             key={page.id}
                                             onClick={openModal}
-                                            to={location.pathname}
+                                            to={`${location.pathname}${location.search}`}
                                         />
                                     }
                                 >
