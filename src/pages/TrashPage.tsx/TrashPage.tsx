@@ -11,7 +11,9 @@ const TrashPage = () => {
                 <TrashPageNothing />
             ) : (
                 <>
-                    <button onClick={() => clearTrashBin()}></button>
+                    <button onClick={() => clearTrashBin()}>
+                        Empty Recycle Bin
+                    </button>
                     <ul>
                         {trashList.map((note) => (
                             <li key={note.id}>

@@ -7,7 +7,13 @@ interface NoteProps {
 }
 
 const NoteComponent = ({ note }: NoteProps) => {
-    const { togglePinned, addtoArchive, addtoTrash } = useNoteStore()
+    const {
+        togglePinned,
+        togglefieldMode,
+        addtoArchive,
+        addtoTrash,
+        setEditingNote,
+    } = useNoteStore()
 
     return (
         <>
@@ -21,6 +27,14 @@ const NoteComponent = ({ note }: NoteProps) => {
             </button>
             <button onClick={() => addtoArchive(note.id)}>arch</button>
             <button onClick={() => addtoTrash(note.id)}>delete</button>
+            <button
+                onClick={() => {
+                    setEditingNote(note)
+                    togglefieldMode()
+                }}
+            >
+                edit
+            </button>
         </>
     )
 }

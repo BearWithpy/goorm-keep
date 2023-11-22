@@ -32,7 +32,7 @@ const EditLabelModal = () => {
     const { isModalOpen, closeModal } = useModalStore()
     const { pageList, addLabelPage, getLabelList, editLabelName, deleteLabel } =
         useMenuStore()
-    const { editLabelInNotes } = useNoteStore()
+    const { editLabelInNotes, deleteLabelInNotes } = useNoteStore()
 
     const [labelName, setLabelName] = useState("")
     const [mode, setMode] = useState(true)
@@ -128,6 +128,11 @@ const EditLabelModal = () => {
                             <div style={{ display: "inline" }}>
                                 Make a New Label
                             </div>
+                            {errorMessage && (
+                                <div className={styles.error_message}>
+                                    {errorMessage}
+                                </div>
+                            )}
                         </>
                     ) : (
                         <>
@@ -198,6 +203,7 @@ const EditLabelModal = () => {
                                         </div>
                                         <IconButton
                                             onClick={() => {
+                                                deleteLabelInNotes(item)
                                                 deleteLabel(item)
                                             }}
                                             style={{ fontSize: "15px" }}
@@ -237,12 +243,6 @@ const EditLabelModal = () => {
                                                 navigate(
                                                     `/label?name=${editingLabelName}`
                                                 )
-
-                                                // editLabelName(
-                                                //     item,
-                                                //     editingLabelName
-                                                // )
-                                                // setEditingLabel(null)
                                             }}
                                             style={{ fontSize: "15px" }}
                                         >
@@ -250,13 +250,6 @@ const EditLabelModal = () => {
                                                 check
                                             </span>
                                         </IconButton>
-                                        {errorMessage && (
-                                            <div
-                                                className={styles.error_message}
-                                            >
-                                                {errorMessage}
-                                            </div>
-                                        )}
                                     </>
                                 )}
                             </li>

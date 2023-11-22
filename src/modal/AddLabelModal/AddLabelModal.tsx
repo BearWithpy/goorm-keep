@@ -1,5 +1,5 @@
 import { Container, Grid, IconButton, TextField } from "@mui/material"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import Modal from "react-modal"
 import styles from "./adddlabelmodal.module.css"
@@ -31,13 +31,20 @@ const AddLabelModal = () => {
     const { isAddModalOpen, closeAddModal } = useModalStore()
 
     const { pageList, addLabelPage, getLabelList } = useMenuStore()
-    const { addLabelsToNote, currentLabel, deleteLabelsFromNote } =
-        useNoteStore()
+    const {
+        addLabelsToNoteEdit,
+        deleteLabelsFromNoteEdit,
+        addLabelsToNote,
+        currentLabel,
+        deleteLabelsFromNote,
+        editingNote,
+    } = useNoteStore()
 
     const [labelName, setLabelName] = useState("")
     const [mode, setMode] = useState(true)
 
     const [errorMessage, setErrorMessage] = useState("")
+    const [labels, setLabels] = useState<string[]>([])
 
     const handleAddLabel = () => {
         if (!labelName) {
@@ -56,6 +63,26 @@ const AddLabelModal = () => {
         setLabelName("")
         setErrorMessage("")
     }
+
+    const addLabelToEditingNote = (label: string) => {
+        if (editingNote && !labels.includes(label)) {
+            setLabels([...labels, label])
+            addLabelsToNoteEdit(label)
+        }
+    }
+
+    const removeLabelFromEditingNote = (label: string) => {
+        if (editingNote && labels.includes(label)) {
+            setLabels(labels.filter((l) => l !== label))
+            deleteLabelsFromNoteEdit(label)
+        }
+    }
+
+    useEffect(() => {
+        if (editingNote) {
+            setLabels(editingNote.labelId)
+        }
+    }, [editingNote])
 
     return (
         <Modal
@@ -151,7 +178,83 @@ const AddLabelModal = () => {
                     {getLabelList().map((item) => {
                         return (
                             <li key={item} className={styles.li_value}>
-                                {!currentLabel.includes(item) ? (
+                                {editingNote ? (
+                                    !labels.includes(item) ? (
+                                        <>
+                                            <div
+                                                className={
+                                                    styles.label_container
+                                                }
+                                            >
+                                                <IconButton
+                                                    onClick={() =>
+                                                        setMode(!mode)
+                                                    }
+                                                    style={{ fontSize: "15px" }}
+                                                >
+                                                    <span className="material-symbols-outlined">
+                                                        label
+                                                    </span>
+                                                </IconButton>
+                                                <div
+                                                    className={
+                                                        styles.label_name
+                                                    }
+                                                >
+                                                    {item}
+                                                </div>
+                                            </div>
+                                            <IconButton
+                                                onClick={() => {
+                                                    addLabelToEditingNote(item)
+                                                }}
+                                                style={{ fontSize: "15px" }}
+                                            >
+                                                <span className="material-symbols-outlined">
+                                                    add
+                                                </span>
+                                            </IconButton>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div
+                                                className={
+                                                    styles.label_container
+                                                }
+                                            >
+                                                <IconButton
+                                                    onClick={() =>
+                                                        setMode(!mode)
+                                                    }
+                                                    style={{ fontSize: "15px" }}
+                                                >
+                                                    <span className="material-symbols-outlined">
+                                                        label
+                                                    </span>
+                                                </IconButton>
+                                                <div
+                                                    className={
+                                                        styles.label_name
+                                                    }
+                                                >
+                                                    {item}
+                                                </div>
+                                            </div>
+                                            <IconButton
+                                                onClick={() => {
+                                                    removeLabelFromEditingNote(
+                                                        item
+                                                    )
+                                                }}
+                                                style={{ fontSize: "15px" }}
+                                            >
+                                                <span className="material-symbols-outlined">
+                                                    close
+                                                </span>
+                                            </IconButton>
+                                        </>
+                                    )
+                                ) : !currentLabel.includes(item) ? (
                                     <>
                                         <div className={styles.label_container}>
                                             <IconButton
@@ -211,7 +314,11 @@ const AddLabelModal = () => {
             </div>
             <div style={{ textAlign: "right", fontSize: "10px" }}>
                 <IconButton
-                    onClick={closeAddModal}
+                    onClick={() => {
+                        if (editingNote) {
+                        }
+                        closeAddModal()
+                    }}
                     style={{ fontSize: "15px" }}
                 >
                     완료

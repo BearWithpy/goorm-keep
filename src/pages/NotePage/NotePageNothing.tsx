@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined"
 import styles from "pages/styles/pagenothing.module.css"

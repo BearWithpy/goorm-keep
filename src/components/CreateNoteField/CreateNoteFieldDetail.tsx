@@ -13,6 +13,7 @@ import Note from "models/note"
 import { v4 as getId } from "uuid"
 import BackgroundColor from "models/backgroundColor"
 import useModalStore from "apps/modalStore"
+import { useLocation } from "react-router-dom"
 
 const PriorityItems = [
     { name: "HIGH", value: Priority.HIGH },
@@ -26,74 +27,25 @@ const BackgroundItems = [
     { name: "Blue", value: BackgroundColor.BLUE },
 ]
 
-const CreateNoteField = () => {
+const CreateNoteFieldDetail = () => {
+    const location = useLocation()
+    const searchParams = new URLSearchParams(location.search)
+    const labelName = searchParams.get("name")!
+
     const [content, setContent] = useState<string>("")
     const [title, setTitle] = useState<string>("")
 
     const [selectedPrior, setSelectedPrior] = useState<Priority>()
     const [selectedColor, setSelectedColor] = useState<BackgroundColor>()
-    const [labels, setLabels] = useState<string[]>([])
 
     const {
-        editingNote,
         togglefieldMode,
         addNote,
         currentLabel,
         clearCurrentLabel,
-        updateNote,
-        setEditingNote,
+        addLabelsToNote,
     } = useNoteStore()
     const { openAddModal } = useModalStore()
-
-    const handleSave = () => {
-        if (!content) {
-            alert("내용이 없습니다!!")
-            return
-        }
-
-        if (editingNote) {
-            const updatedNote = {
-                ...editingNote,
-                title: title,
-                content: content,
-                backgroundColor: selectedColor ?? BackgroundColor.WHITE,
-                labelId: labels,
-                priority: selectedPrior ?? Priority.LOW,
-                updatedAt: new Date(),
-            }
-
-            updateNote(updatedNote)
-        } else {
-            const newNote: Note = {
-                id: getId(),
-                title: title,
-                content: content ?? "",
-                backgroundColor: selectedColor ?? BackgroundColor.WHITE,
-                labelId: currentLabel,
-                archived: false,
-                pinned: false,
-                trashed: false,
-                priority: selectedPrior ?? Priority.LOW,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            }
-            addNote(newNote)
-        }
-
-        setEditingNote(null)
-        togglefieldMode()
-        clearCurrentLabel()
-    }
-
-    useEffect(() => {
-        if (editingNote) {
-            setTitle(editingNote.title)
-            setContent(editingNote.content)
-            setSelectedPrior(editingNote.priority)
-            setSelectedColor(editingNote.backgroundColor)
-            setLabels(editingNote.labelId)
-        }
-    }, [editingNote])
 
     return (
         <div>
@@ -123,22 +75,9 @@ const CreateNoteField = () => {
                     }}
                 />
                 <div className={styles.editor_labels_container}>
-                    {editingNote ? (
+                    {currentLabel.length > 0 ? (
                         <>
-                            <p>labels</p>
-                            {labels.map((label) => (
-                                <span
-                                    key={label}
-                                    className={styles.editor_labels_item}
-                                    style={{ marginRight: "10px" }}
-                                >
-                                    {label}
-                                </span>
-                            ))}
-                        </>
-                    ) : (
-                        <>
-                            <p>labels</p>
+                            <p>Labels</p>
                             {currentLabel.map((label) => (
                                 <span
                                     key={label}
@@ -149,6 +88,8 @@ const CreateNoteField = () => {
                                 </span>
                             ))}
                         </>
+                    ) : (
+                        <></>
                     )}
                 </div>
                 <div className={styles.editor_option_container}>
@@ -177,7 +118,30 @@ const CreateNoteField = () => {
                 </div>
                 <div className={styles.editor_button_container}>
                     <ButtonPrime
-                        onClick={() => handleSave()}
+                        onClick={() => {
+                            if (!content) {
+                                alert("내용이 없습니다!!")
+                                return
+                            }
+
+                            const newNote: Note = {
+                                id: getId(),
+                                title: title,
+                                content: content ?? "",
+                                backgroundColor:
+                                    selectedColor ?? BackgroundColor.WHITE,
+                                labelId: currentLabel,
+                                archived: false,
+                                pinned: false,
+                                trashed: false,
+                                priority: selectedPrior ?? Priority.LOW,
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                            }
+                            addNote(newNote)
+                            togglefieldMode()
+                            clearCurrentLabel()
+                        }}
                         type="submit"
                         label="Save"
                         className={styles.editor_save_button}
@@ -188,4 +152,4 @@ const CreateNoteField = () => {
     )
 }
 
-export default CreateNoteField
+export default CreateNoteFieldDetail

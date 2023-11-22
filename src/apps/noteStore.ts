@@ -7,6 +7,7 @@ interface NoteStore {
     trashList: Note[]
     currentLabel: string[]
     textfieldMode: boolean
+    editingNote: Note | null
     addNote: (newNote: Note) => void
     togglePinned: (id: string) => void
     addLabelsToNote: (label: string) => void
@@ -20,6 +21,11 @@ interface NoteStore {
     restoreToNoteListFromArchive: (id: string) => void
     editLabelInNotes: (oldLabel: string, newLabel: string) => void
     deleteOneFromTrash: (id: string) => void
+    deleteLabelInNotes: (label: string) => void
+    setEditingNote: (note: Note | null) => void
+    updateNote: (updatedNote: Note) => void
+    addLabelsToNoteEdit: (label: string) => void
+    deleteLabelsFromNoteEdit: (label: string) => void
 }
 
 const useNoteStore = create<NoteStore>(
@@ -29,6 +35,8 @@ const useNoteStore = create<NoteStore>(
         archiveList: [],
         trashList: [],
         textfieldMode: false,
+        editingNote: null,
+        setEditingNote: (note) => set({ editingNote: note }),
         addtoArchive: (id) => {
             set((state) => ({
                 archiveList: [
@@ -100,6 +108,41 @@ const useNoteStore = create<NoteStore>(
                 currentLabel: state.currentLabel.filter((lb) => lb !== label),
             }))
         },
+        addLabelsToNoteEdit: (label) => {
+            set((state) => {
+                if (
+                    state.editingNote &&
+                    !state.editingNote.labelId.includes(label)
+                ) {
+                    return {
+                        editingNote: {
+                            ...state.editingNote,
+                            labelId: [...state.editingNote.labelId, label],
+                        },
+                    }
+                }
+                return {}
+            })
+        },
+
+        deleteLabelsFromNoteEdit: (label) => {
+            set((state) => {
+                if (
+                    state.editingNote &&
+                    state.editingNote.labelId.includes(label)
+                ) {
+                    return {
+                        editingNote: {
+                            ...state.editingNote,
+                            labelId: state.editingNote.labelId.filter(
+                                (l) => l !== label
+                            ),
+                        },
+                    }
+                }
+                return {}
+            })
+        },
         clearCurrentLabel: () => {
             set(() => ({
                 currentLabel: [],
@@ -116,6 +159,22 @@ const useNoteStore = create<NoteStore>(
                     ),
                 })),
             }))
+        },
+        deleteLabelInNotes: (label) => {
+            set((state) => ({
+                noteList: state.noteList.map((note) => ({
+                    ...note,
+                    labelId: note.labelId.filter((lb) => lb !== label),
+                })),
+            }))
+        },
+        updateNote: (updatedNote: Note) => {
+            set((state) => {
+                const updatedNotes = state.noteList.map((note) =>
+                    note.id === updatedNote.id ? updatedNote : note
+                )
+                return { noteList: updatedNotes }
+            })
         },
     })
 )

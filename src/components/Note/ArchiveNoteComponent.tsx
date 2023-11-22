@@ -21,6 +21,7 @@ const ArchiveNoteComponent = ({ note }: ArcNoteProps) => {
                 unarchive
             </button>
             <button onClick={() => addtoTrash(note.id)}>delete</button>
+            <button onClick={() => {}}>edit</button>
         </>
     )
 }
