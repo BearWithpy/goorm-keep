@@ -2,31 +2,47 @@ import Page from "models/page"
 import PageType from "models/pageType"
 import { create } from "zustand"
 
+import { v4 as getId } from "uuid"
+
+import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined"
+
 interface MenuStore {
     pageList: Page[]
     addLabelPage: (name: string) => void
+    getLabelList: () => string[]
+    editLabelName: (currentName: string, newName: string) => void
+    deleteLabel: (labelName: string) => void
 }
 
 const useMenuStore = create<MenuStore>(
     (set): MenuStore => ({
         pageList: [
-            { name: PageType.NOTES, path: "/", type: PageType.NOTES },
             {
+                id: "main",
+                name: PageType.NOTES,
+                path: "/",
+                type: PageType.NOTES,
+            },
+            {
+                id: "notice",
                 name: PageType.NOTICE,
                 path: `/${PageType.NOTICE}`,
                 type: PageType.NOTICE,
             },
             {
+                id: "edit",
                 name: PageType.EDIT,
                 path: `/${PageType.EDIT}`,
                 type: PageType.EDIT,
             },
             {
+                id: "archive",
                 name: PageType.ARCHIVE,
                 path: `/${PageType.ARCHIVE}`,
                 type: PageType.ARCHIVE,
             },
             {
+                id: "trash",
                 name: PageType.TRASH,
                 path: `/${PageType.TRASH}`,
                 type: PageType.TRASH,
@@ -35,6 +51,7 @@ const useMenuStore = create<MenuStore>(
         addLabelPage: (name) => {
             set((state) => {
                 const newPage = {
+                    id: getId(),
                     name: name,
                     path: `/label?name=${name}`,
                     type: PageType.LABEL,
@@ -54,6 +71,44 @@ const useMenuStore = create<MenuStore>(
                 ]
 
                 return {
+                    pageList: updatedPageList,
+                }
+            })
+        },
+        getLabelList: () => {
+            const state = useMenuStore.getState()
+            return state.pageList
+                .filter((page) => page.type === PageType.LABEL)
+                .map((labelPage) => labelPage.name)
+        },
+        editLabelName: (currentName, newName) => {
+            set((state) => {
+                // Map through the pageList to find and update the label
+                const updatedPageList = state.pageList.map((page) => {
+                    if (
+                        page.type === PageType.LABEL &&
+                        page.name === currentName
+                    ) {
+                        // If it's the label we want to edit, update its name
+                        return { ...page, name: newName }
+                    }
+                    return page // Otherwise, leave it as is
+                })
+
+                return {
+                    ...state,
+                    pageList: updatedPageList,
+                }
+            })
+        },
+        deleteLabel: (labelName) => {
+            set((state) => {
+                const updatedPageList = state.pageList.filter(
+                    (page) => page.name !== labelName
+                )
+
+                return {
+                    ...state,
                     pageList: updatedPageList,
                 }
             })
