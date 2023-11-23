@@ -1,7 +1,7 @@
 import React from "react"
 import useNoteStore from "apps/noteStore"
 import TrashPageNothing from "./TrashPageNothing"
-import TrashNoteComponent from "components/Note/TrashNoteComponent"
+import TrashNoteComponent from "components/Note/TrashNoteComponent/TrashNoteComponent"
 
 const TrashPage = () => {
     const { trashList, clearTrashBin } = useNoteStore()

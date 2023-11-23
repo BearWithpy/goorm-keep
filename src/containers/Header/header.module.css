@@ -2,6 +2,15 @@
     margin-top: 10px;
     margin-left: 15px;
     display: flex;
+    justify-content: space-between;
+}
+
+.sub_group {
+    display: flex;
+}
+
+.sort_button {
+    margin-right: 40px;
 }
 
 .title_text {

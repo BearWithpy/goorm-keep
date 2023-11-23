@@ -45,6 +45,13 @@ const EditLabelModal = () => {
         if (!editingLabelName) {
             return
         }
+
+        if (editingLabelName === item) {
+            // setErrorMessage("이건 뭐여")
+            setEditingLabel(null)
+            return
+        }
+
         const labelExists = pageList.some(
             (page) =>
                 page.name === editingLabelName && page.type === PageType.LABEL

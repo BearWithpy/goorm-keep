@@ -1,15 +1,14 @@
 import React from "react"
 import useNoteStore from "apps/noteStore"
 import Note from "models/note"
-import { IconButton } from "@mui/material"
-
-import EditNoteIcon from "@mui/icons-material/EditNote"
-import DeleteIcon from "@mui/icons-material/Delete"
-import UnarchiveIcon from "@mui/icons-material/Unarchive"
 
 import basestyles from "components/Note/notecomponent.module.css"
 import styles from "components/Note/TrashNoteComponent/trashnote.module.css"
 import formatDate from "utils/formatDate"
+
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
+import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash"
+import { IconButton } from "@mui/material"
 
 import * as DOMPurify from "dompurify"
 
@@ -17,8 +16,8 @@ interface ArcNoteProps {
     note: Note
 }
 
-const ArchiveNoteComponent = ({ note }: ArcNoteProps) => {
-    const { restoreToNoteListFromArchive, addtoTrash } = useNoteStore()
+const TrashNoteComponent = ({ note }: ArcNoteProps) => {
+    const { restoreToNoteListFromTrash, deleteOneFromTrash } = useNoteStore()
 
     return (
         <>
@@ -59,20 +58,16 @@ const ArchiveNoteComponent = ({ note }: ArcNoteProps) => {
                         {formatDate(note.updatedAt)}
                     </div>
                     <IconButton
-                        onClick={() => restoreToNoteListFromArchive(note.id)}
+                        onClick={() => restoreToNoteListFromTrash(note.id)}
                     >
-                        <UnarchiveIcon />
+                        <RestoreFromTrashIcon />
                     </IconButton>
-                    {/* <IconButton onClick={() => addtoTrash(note.id)}>
-                    <EditNoteIcon />
-                    </IconButton> */}
-                    <IconButton onClick={() => addtoTrash(note.id)}>
-                        <DeleteIcon />
+                    <IconButton onClick={() => deleteOneFromTrash(note.id)}>
+                        <DeleteForeverIcon />
                     </IconButton>
                 </div>
             </div>
         </>
     )
 }
-
-export default ArchiveNoteComponent
+export default TrashNoteComponent

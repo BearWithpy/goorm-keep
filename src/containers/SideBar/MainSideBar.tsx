@@ -19,7 +19,10 @@ const MainSideBar = () => {
         <div>
             <Sidebar
                 collapsed={isBarOpen}
-                style={{ height: "91vh", position: "absolute" }}
+                style={{
+                    height: "91vh",
+                    position: "absolute",
+                }}
                 rootStyles={{
                     [`.${sidebarClasses.container}`]: {
                         backgroundColor: "#fff",
